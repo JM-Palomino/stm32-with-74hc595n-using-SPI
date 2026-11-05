@@ -18,34 +18,36 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "i2c.h"
+#include "spi.h"
 #include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd.h"
-#include "inputs_74ls165.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+extern SPI_HandleTypeDef hspi1;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SHIFT_LATCH   GPIO_PIN_0
+#define LOW  GPIO_PIN_RESET
+#define HIGH  GPIO_PIN_SET
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+unsigned char leds [14] = {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x40,0x20,0x10,0x08,0x04,0x02};
+uint8_t i = 0;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int key=0;
 
 /* USER CODE END PV */
 
@@ -57,6 +59,14 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void SIPO_Write( unsigned char value)
+{
+     
+    HAL_GPIO_WritePin(GPIOB, SHIFT_LATCH, LOW);
+	  HAL_SPI_Transmit(&hspi1, &value, 1, HAL_MAX_DELAY);
+	  HAL_GPIO_WritePin(GPIOB, SHIFT_LATCH, HIGH);
+}
+
 
 /* USER CODE END 0 */
 
@@ -88,14 +98,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_SPI1_Init();
   MX_TIM10_Init();
-  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-   HAL_TIM_Base_Start(&htim10); 
-	 I2C_LCD_Init();
-   I2C_LCD_Cmd(_LCD_CURSOR_OFF);
-   I2C_LCD_Cmd(_LCD_CLEAR);
-	 I2C_LCD_Out(1,3,"KEYPAD_4x4"); 
+   HAL_TIM_Base_Start(&htim10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,77 +109,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-		key=Byte();
-		HAL_Delay(10);
 		
-		switch(key)
-			{
-				case 24:
-					 I2C_LCD_Chr(2,8,'1');
-					break;
-        
-				case 40:
-					 I2C_LCD_Chr(2,8,'2');
-					break;
-				
-				case 72:
-					 I2C_LCD_Chr(2,8,'3');
-					break;
-        
-				case 136:
-					 I2C_LCD_Chr(2,8,'A');
-					break;
-				
-					case 20:
-					 I2C_LCD_Chr(2,8,'4');
-					break;
-        
-				 case 36:
-					 I2C_LCD_Chr(2,8,'5');
-					break;
-				
-				case 68:
-					 I2C_LCD_Chr(2,8,'6');
-					break;
-        
-				case 132:
-					 I2C_LCD_Chr(2,8,'B');
-					break;
-				
-				case 18:
-					 I2C_LCD_Chr(2,8,'7');
-					break;
-        
-				case 34:
-					 I2C_LCD_Chr(2,8,'8');
-					break;
-				
-				case 66:
-					 I2C_LCD_Chr(2,8,'9');
-					break;
-        
-				case 130:
-					 I2C_LCD_Chr(2,8,'C');
-					break;
-				
-					case 17:
-					 I2C_LCD_Chr(2,8,'*');
-					break;
-        
-				 case 33:
-					 I2C_LCD_Chr(2,8,'0');
-					break;
-				
-				case 65:
-					 I2C_LCD_Chr(2,8,'#');
-					break;
-        
-				case 129:
-					 I2C_LCD_Chr(2,8,'D');
-					break;
-			}
+    /* USER CODE BEGIN 3 */
+		 for (i = 0; i < 14; i++) {
+		SIPO_Write(leds[i]);
+		HAL_Delay(100);	
+	 	
+  } 		 
 		
 		
   }

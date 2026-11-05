@@ -41,8 +41,7 @@ extern TIM_HandleTypeDef htim10;
 void MX_TIM10_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void DelayMicro(uint16_t tiempo);
-
+void delay_us(uint16_t tiempo);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

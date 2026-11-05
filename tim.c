@@ -40,7 +40,7 @@ void MX_TIM10_Init(void)
   htim10.Instance = TIM10;
   htim10.Init.Prescaler = 100-1;
   htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim10.Init.Period = 65535;
+  htim10.Init.Period = 0xFFFF-1;
   htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
@@ -86,9 +86,10 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void DelayMicro(uint16_t tiempo)
+void delay_us(uint16_t tiempo)
 {
-__HAL_TIM_SET_COUNTER(&htim10,0);  // set the counter value a 0
+ 
+	__HAL_TIM_SET_COUNTER(&htim10,0);  // set the counter value a 0
 	while (__HAL_TIM_GET_COUNTER(&htim10) < tiempo); 
 }
 /* USER CODE END 1 */
